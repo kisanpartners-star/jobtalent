@@ -74,6 +74,11 @@ if (dist) {
     maxAge: env.isProd ? '7d' : 0,
   }));
 
+  app.use('/assets', (_req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.status(404).json({ error: 'Frontend asset not found. Deploy the complete server/dist/assets directory.' });
+  });
+
   app.get('*', async (req, res, next) => {
     try {
       const html = await renderIndex(req.path);
