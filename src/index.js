@@ -41,6 +41,7 @@ app.use(cookieParser());
 for (const dir of ['branding', 'images', 'videos']) {
   app.use(`/uploads/${dir}`, express.static(path.join(UPLOAD_DIR, dir), { maxAge: env.isProd ? '7d' : 0, index: false, dotfiles: 'deny' }));
 }
+app.get('/favicon.ico', (_req, res) => res.redirect(308, '/uploads/branding/favicon.png'));
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, db: mongoose.connection.readyState === 1 }));
 app.use('/api/public', publicRoutes);
@@ -60,10 +61,13 @@ app.use('/api', notFound);
 // Production: serve the built client with server-injected SEO tags
 
 
-const dist = path.join(ROOT_DIR, '..', 'client', 'dist');
+const dist = [
+  path.join(ROOT_DIR, '..', 'client', 'dist'),
+  path.join(ROOT_DIR, 'dist'),
+].find((dir) => fs.existsSync(path.join(dir, 'index.html')));
 
-if (fs.existsSync(path.join(dist, 'index.html'))) {
-  loadIndex();
+if (dist) {
+  loadIndex(path.join(dist, 'index.html'));
 
   app.use(express.static(dist, {
     index: false,
@@ -85,7 +89,7 @@ if (fs.existsSync(path.join(dist, 'index.html'))) {
     }
   });
 } else {
-  console.error(`[server] Frontend index.html not found: ${dist}`);
+  console.error('[server] Frontend index.html not found in client/dist or server/dist. Build the client before starting the server.');
 }
 
 

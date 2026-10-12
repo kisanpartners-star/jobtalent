@@ -93,8 +93,7 @@ export function headHtml({ meta, settings, canonical }) {
 
 /* ---------- serve client build with injected head ---------- */
 let indexCache = null;
-export function loadIndex() {
-  const file = path.join(ROOT_DIR, '..', 'client', 'dist', 'index.html');
+export function loadIndex(file = path.join(ROOT_DIR, '..', 'client', 'dist', 'index.html')) {
   if (!fs.existsSync(file)) return null;
   indexCache = fs.readFileSync(file, 'utf8');
   return indexCache;
