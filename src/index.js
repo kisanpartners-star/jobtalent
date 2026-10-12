@@ -30,10 +30,6 @@ app.use(helmet({
     },
   },
 }));
-app.use(cors({
-  origin: (origin, cb) => (!origin || env.clientOrigins.includes(origin) ? cb(null, true) : cb(new Error('Origin not allowed'))),
-  credentials: true,
-}));
 app.use(express.json({ limit: '200kb' }));
 app.use(cookieParser());
 
@@ -42,6 +38,18 @@ for (const dir of ['branding', 'images', 'videos']) {
   app.use(`/uploads/${dir}`, express.static(path.join(UPLOAD_DIR, dir), { maxAge: env.isProd ? '7d' : 0, index: false, dotfiles: 'deny' }));
 }
 app.get('/favicon.ico', (_req, res) => res.redirect(308, '/uploads/branding/favicon.png'));
+
+app.use('/api', (req, res, next) => {
+  const requestOrigin = `${req.protocol}://${req.get('host')}`;
+  return cors({
+    origin: (origin, cb) => (
+      !origin || origin === requestOrigin || env.clientOrigins.includes(origin)
+        ? cb(null, true)
+        : cb(new Error('Origin not allowed'))
+    ),
+    credentials: true,
+  })(req, res, next);
+});
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, db: mongoose.connection.readyState === 1 }));
 app.use('/api/public', publicRoutes);
