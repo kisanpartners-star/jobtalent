@@ -60,7 +60,7 @@ app.use('/api', notFound);
 // Production: serve the built client with server-injected SEO tags
 
 
-const dist = path.join(ROOT_DIR, 'dist');
+const dist = path.join(ROOT_DIR, '..', 'client', 'dist');
 
 if (fs.existsSync(path.join(dist, 'index.html'))) {
   loadIndex();
