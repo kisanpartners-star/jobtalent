@@ -58,18 +58,36 @@ app.get('/robots.txt', (_req, res) => res.type('text/plain').send(robotsTxt()));
 app.use('/api', notFound);
 
 // Production: serve the built client with server-injected SEO tags
-const dist = path.join(ROOT_DIR, '..', 'client', 'dist');
-if (fs.existsSync(dist)) {
+
+
+const dist = path.join(ROOT_DIR, 'dist');
+
+if (fs.existsSync(path.join(dist, 'index.html'))) {
   loadIndex();
-  app.use(express.static(dist, { index: false, maxAge: env.isProd ? '7d' : 0 }));
+
+  app.use(express.static(dist, {
+    index: false,
+    maxAge: env.isProd ? '7d' : 0,
+  }));
+
   app.get('*', async (req, res, next) => {
     try {
       const html = await renderIndex(req.path);
-      if (!html) return next();
-      res.set('Cache-Control', 'no-cache').type('html').send(html);
-    } catch (e) { next(e); }
+
+      if (html) {
+        res.set('Cache-Control', 'no-cache');
+        return res.type('html').send(html);
+      }
+
+      return res.sendFile(path.join(dist, 'index.html'));
+    } catch (error) {
+      next(error);
+    }
   });
+} else {
+  console.error(`[server] Frontend index.html not found: ${dist}`);
 }
+
 
 app.use(notFound);
 app.use(errorHandler);
