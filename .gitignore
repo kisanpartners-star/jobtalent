@@ -6,5 +6,7 @@ server/uploads/resumes/*
 server/uploads/documents/*
 !server/uploads/**/.gitkeep
 !server/uploads/documents/*-fallback.pdf
+!dist/
+!dist/**
 *.log
 .DS_Store

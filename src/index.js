@@ -62,8 +62,8 @@ app.use('/api', notFound);
 
 
 const dist = [
-  path.join(ROOT_DIR, '..', 'client', 'dist'),
   path.join(ROOT_DIR, 'dist'),
+  path.join(ROOT_DIR, '..', 'client', 'dist'),
 ].find((dir) => fs.existsSync(path.join(dir, 'index.html')));
 
 if (dist) {
