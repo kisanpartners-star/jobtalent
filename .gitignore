@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+server/.env
+server/uploads/resumes/*
+server/uploads/documents/*
+!server/uploads/**/.gitkeep
+!server/uploads/documents/*-fallback.pdf
+*.log
+.DS_Store
